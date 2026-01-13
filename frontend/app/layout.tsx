@@ -13,6 +13,9 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "GigFlow",
   description: "Connect with elite talent and secure high-value gigs.",
+  icons: {
+    icon: '/gigflow.png'
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
