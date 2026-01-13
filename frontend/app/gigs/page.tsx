@@ -22,7 +22,7 @@ export default function HomePage() {
       <h1 className="text-3xl font-bold mb-6">Open Gigs</h1>
       <div className="space-y-4">
         {gigs.map((gig) => (
-          <Link href={`/gigs/${gig._id}`}>
+          <Link href={`/gigs/${gig._id}`} key={gig._id}>
             <div
             key={gig._id}
             className="p-4 border rounded hover:shadow cursor-pointer"

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { user, login, loading } = useAuth();
     const [form, setForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
 
@@ -16,7 +16,8 @@ export default function LoginPage() {
 
     try {
       await login(form.email, form.password);
-      router.push('/dashboard')
+      const redirectPath = user?.role === 'owner' ? '/dashboard?tab=owner' : '/dashboard?tab=freelancer';
+      router.push(redirectPath);
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     }

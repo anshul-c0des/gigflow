@@ -8,6 +8,8 @@ import { Search, Send, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/context/AuthContext";
+import { getSocket } from "@/lib/socket";
 
 interface Bid {
   _id: string;
@@ -24,6 +26,7 @@ interface Bid {
 export default function FreelancerDashboard() {
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchMyBids = async () => {
@@ -40,7 +43,30 @@ export default function FreelancerDashboard() {
     fetchMyBids();
   }, []);
 
-  // Derived Stats
+  useEffect(() => {
+    if (!user) return;
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleStatusUpdate = (data: any) => {
+      if (data.type === "hired" || data.type === "rejected") {
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid.gig?._id === data.gigId 
+              ? { ...bid, status: data.type as "hired" | "rejected" } 
+              : bid
+          )
+        );
+      }
+    };
+
+    socket.on("notification:new", handleStatusUpdate);
+
+    return () => {
+      socket.off("notification:new", handleStatusUpdate);
+    };
+  }, [user]);
+
   const bidsSent = bids.length;
   const gigsWon = bids.filter((bid) => bid.status === "hired").length;
 

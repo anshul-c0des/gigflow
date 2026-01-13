@@ -1,134 +1,155 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription 
-} from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { 
-  User, 
   Mail, 
-  ShieldCheck, 
   Calendar, 
   LogOut, 
-  Settings2 
+  Wallet, 
+  CreditCard,
+  CheckCircle2,
+  Briefcase,
+  Users,
+  Send,
+  PieChart
 } from "lucide-react";
-
-// Standard shadcn Card imports (Ensure these are in your components folder)
-import { Card as ShadCard, CardContent as ShadContent, CardHeader as ShadHeader, CardTitle as ShadTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import api from "@/lib/axios";
 
 export default function ProfilePage() {
   const { user, logout, loading } = useAuth();
+  const [stats, setStats] = useState({ 
+    totalEarned: 0, 
+    totalSpent: 0, 
+    bidsPlaced: 0,
+    gigsWon: 0,
+    gigsCreated: 0,
+    totalBidsReceived: 0
+  });
 
-  if (loading) return <div className="container py-10">Loading Profile...</div>;
-  if (!user) return <div className="container py-10">Please login to view profile.</div>;
+  useEffect(() => {
+    const fetchFluidStats = async () => {
+      try {
+        const [bidRes, gigRes] = await Promise.all([
+          api.get("/bids/my-bids"),
+          api.get("/gigs/my-gigs")
+        ]);
+
+        const myBids = Array.isArray(bidRes.data) ? bidRes.data : bidRes.data.bids || [];
+        const myGigs = Array.isArray(gigRes.data) ? gigRes.data : gigRes.data.gigs || [];
+
+        setStats({
+          bidsPlaced: myBids.length,
+          gigsWon: myBids.filter((b: any) => b.status === "hired").length,
+          totalEarned: myBids.filter((b: any) => b.status === "hired").reduce((s: number, b: any) => s + b.amount, 0),
+          
+          gigsCreated: myGigs.length,
+          totalBidsReceived: myGigs.reduce((s: number, g: any) => s + (g.bids?.length || 0), 0),
+          totalSpent: myGigs.filter((g: any) => g.status === "assigned").reduce((s: number, g: any) => s + (Number(g.budget) || 0), 0)
+        });
+      } catch (err) {
+        console.error("Failed to load stats", err);
+      }
+    };
+
+    if (user) fetchFluidStats();
+  }, [user]);
+
+  const successRate = stats.bidsPlaced > 0 
+    ? Math.round((stats.gigsWon / stats.bidsPlaced) * 100) 
+    : 0;
+
+  if (loading) return <div className="container py-10 text-center">Loading Profile...</div>;
+  if (!user) return <div className="container py-10 text-center">Please login.</div>;
 
   return (
-    <div className="container max-w-4xl py-10 space-y-8">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row items-center gap-6 p-8 border rounded-xl bg-card">
-        <Avatar className="h-24 w-24 border-4 border-primary/10">
-          <AvatarImage src="" />
-          <AvatarFallback className="text-2xl bg-primary/5 text-primary">
+    <div className="container max-w-5xl py-10 space-y-10">
+      {/* 1. Profile Header */}
+      <div className="flex flex-col md:flex-row items-center gap-6 p-6 border rounded-2xl bg-card shadow-sm">
+        <Avatar className="h-20 w-20 border-2 border-primary/10">
+          <AvatarFallback className="text-xl bg-primary/5 text-primary font-bold">
             {user.name.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
-        
-        <div className="flex-1 text-center md:text-left space-y-2">
-          <div className="flex flex-col md:flex-row md:items-center gap-2">
-            <h1 className="text-3xl font-bold">{user.name}</h1>
-            <Badge variant="secondary" className="w-fit mx-auto md:mx-0 uppercase tracking-wider text-[10px]">
-              {user.role}
-            </Badge>
+        <div className="flex-1 text-center md:text-left">
+          <h1 className="text-2xl font-bold">{user.name}</h1>
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-1 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5"><Mail className="h-4 w-4" /> {user.email}</span>
+            <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" /> Joined Jan 2026</span>
           </div>
-          <p className="text-muted-foreground flex items-center justify-center md:justify-start gap-2">
-            <Mail className="h-4 w-4" /> {user.email}
-          </p>
         </div>
-
-        <Button variant="outline" size="sm" className="hidden md:flex">
-          <Settings2 className="mr-2 h-4 w-4" /> Edit Profile
+        <Button variant="outline" onClick={logout} className="text-destructive border-destructive/20 hover:bg-destructive/5">
+          <LogOut className="mr-2 h-4 w-4" /> Log out
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Account Details */}
-        <ShadCard>
-          <ShadHeader>
-            <ShadTitle className="text-lg flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" /> Account Information
-            </ShadTitle>
-          </ShadHeader>
-          <ShadContent className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-muted-foreground text-sm flex items-center gap-2">
-                <Calendar className="h-4 w-4" /> Member Since
-              </span>
-              <span className="font-medium">January 2026</span>
+      <div className="grid gap-8 md:grid-cols-2">
+        {/* 2. Freelancer Category */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2 px-1">
+            <Briefcase className="h-5 w-5 text-primary" /> Freelancer Activity
+          </h2>
+          <div className="grid gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard title="Bids Placed" value={stats.bidsPlaced} icon={<Send className="h-4 w-4" />} />
+              <StatCard title="Success Rate" value={`${successRate}%`} icon={<PieChart className="h-4 w-4" />} />
             </div>
-            <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-muted-foreground text-sm flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4" /> Status
-              </span>
-              <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/10 border-none">
-                Verified
-              </Badge>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-muted-foreground text-sm flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4" /> Two-Factor
-              </span>
-              <span className="text-sm text-destructive font-medium underline cursor-pointer">
-                Enable Now
-              </span>
-            </div>
-          </ShadContent>
-        </ShadCard>
-
-        {/* Role Specific History (Placeholder for Phase 3/4) */}
-        <ShadCard>
-          <ShadHeader>
-            <ShadTitle className="text-lg">
-              {user.role === 'owner' ? 'Hiring Overview' : 'Work Overview'}
-            </ShadTitle>
-          </ShadHeader>
-          <ShadContent className="flex flex-col items-center justify-center py-6 text-center">
-            <div className="rounded-full bg-muted p-4 mb-4">
-              <ShieldCheck className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {user.role === 'owner' 
-                ? "You haven't hired any freelancers yet." 
-                : "You haven't completed any gigs yet."}
-            </p>
-            <Button variant="link" className="mt-2 text-primary" asChild>
-              <a href={user.role === 'owner' ? "/gigs/create" : "/gigs"}>
-                {user.role === 'owner' ? "Post your first gig" : "Browse marketplace"}
-              </a>
-            </Button>
-          </ShadContent>
-        </ShadCard>
-      </div>
-
-      {/* Danger Zone */}
-      <div className="pt-6 border-t">
-        <h3 className="text-lg font-semibold text-destructive mb-4">Danger Zone</h3>
-        <div className="flex items-center justify-between p-4 border border-destructive/20 rounded-lg bg-destructive/5">
-          <div>
-            <p className="font-medium">Sign out of your account</p>
-            <p className="text-sm text-muted-foreground">Log out from this device immediately.</p>
+            <Card className="bg-green-50/30 border-green-100">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-green-700">Total Earned</p>
+                    <p className="text-3xl font-bold text-green-600">${stats.totalEarned}</p>
+                  </div>
+                  <Wallet className="h-8 w-8 text-green-200" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <Button variant="destructive" onClick={logout}>
-            <LogOut className="mr-2 h-4 w-4" /> Log out
-          </Button>
+        </div>
+
+        {/* 3. Owner Category */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2 px-1">
+            <Users className="h-5 w-5 text-blue-600" /> Owner Activity
+          </h2>
+          <div className="grid gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard title="Gigs Created" value={stats.gigsCreated} icon={<Briefcase className="h-4 w-4 text-blue-600" />} />
+              <StatCard title="Bids Received" value={stats.totalBidsReceived} icon={<Users className="h-4 w-4 text-blue-600" />} />
+            </div>
+            <Card className="bg-blue-50/30 border-blue-100">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-700">Amount Spent</p>
+                    <p className="text-3xl font-bold text-blue-600">${stats.totalSpent}</p>
+                  </div>
+                  <CreditCard className="h-8 w-8 text-blue-200" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function StatCard({ title, value, icon }: { title: string; value: string | number; icon: React.ReactNode }) {
+  return (
+    <Card>
+      <CardContent className="p-4 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-tight">{title}</p>
+          <p className="text-xl font-bold mt-1">{value}</p>
+        </div>
+        <div className="text-muted-foreground opacity-50">{icon}</div>
+      </CardContent>
+    </Card>
   );
 }

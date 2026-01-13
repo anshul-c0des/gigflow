@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, PlusCircle, LayoutDashboard, Briefcase, User, LogOut } from "lucide-react";
+import { PlusCircle, LayoutDashboard, Briefcase, User, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { 
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Notifications from "./Notifications";
 
 export default function Navbar() {
   const { user, logout, loading } = useAuth();
@@ -40,7 +41,7 @@ export default function Navbar() {
                 href="/gigs" 
                 className={isActive('/gigs') ? "text-primary" : "text-muted-foreground hover:text-primary"}
               >
-                Browse Gigs
+                Marketplace
               </Link>
             </div>
           )}
@@ -58,10 +59,7 @@ export default function Navbar() {
                 </Button>
               )}
 
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-primary" />
-              </Button>
+              <Notifications />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

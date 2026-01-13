@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import axios from "@/lib/axios";
 import { useAuth } from "@/context/AuthContext";
 import { BidForm } from "@/components/bids/BidForm";
 import { getSocket } from "@/lib/socket";
@@ -37,19 +36,24 @@ export default function GigDetailPage() {
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
 
+
+  const isSpecificOwner = user?.id === gig?.owner._id;
+  const canPlaceBid = !isSpecificOwner && !loading && gig?.status === "open";
+  const hasAlreadyBid = bids.some((b) => (b.freelancer._id.toString() === user?.id));
+
   useEffect(() => {
-    if (!user) return;
-  
+    if (!user || !isSpecificOwner) return;
     const socket = getSocket();
-  
-    socket.on("bid:created", (newBid) => {
+    if (!socket) return;
+
+    const handleNewBid = (newBid: Bid) => {
       setBids((prev) => [newBid, ...prev]);
-    });
-  
-    return () => {
-      socket.off("bid:created");
+      toast.success("New bid received!");
     };
-  }, [user]);
+    
+    socket.on("bid:created", handleNewBid);
+    return () => { socket.off("bid:created", handleNewBid); };
+  }, [user, isSpecificOwner]);
   
 
   useEffect(() => {
@@ -74,7 +78,6 @@ export default function GigDetailPage() {
     try {
       await api.post(`/gigs/${gig?._id}/hire`, { bidId });
       
-      // Optimistic Update
       setBids((prev) =>
         prev.map((b) => ({
           ...b,
@@ -96,40 +99,34 @@ export default function GigDetailPage() {
   if (loading) return <div className="p-10 text-center">Loading...</div>;
   if (!gig) return <div className="p-10 text-center">Gig not found</div>;
 
-  const isOwner = user?.id === gig.owner._id;
-  const isFreelancer = user?.role === "freelancer";
-  const hasAlreadyBid = bids.some(b => b.freelancer._id.toString() === user?.id);
-
   return (
     <main className="max-w-4xl mx-auto py-8 px-4 space-y-6">
-      {/* 1. Gig Header Information */}
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold">{gig.title}</h1>
           <p className="text-muted-foreground mt-1">Posted by {gig.owner.name}</p>
         </div>
-        <Badge variant={gig.status === "open" ? "default" : "secondary"} className="text-sm">
-          {gig.status.toUpperCase()}
-        </Badge>
-        {isOwner && (
-          <EditGigModal gig={gig} onUpdate={handleGigUpdate} />
-        )}
+        <div className="flex gap-2">
+          <Badge variant={gig.status === "open" ? "default" : "secondary"}>
+            {gig.status.toUpperCase()}
+          </Badge>
+          {isSpecificOwner && (
+            <EditGigModal gig={gig} onUpdate={handleGigUpdate} />
+          )}
+        </div>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Project Description</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <p className="whitespace-pre-wrap text-gray-700">{gig.description}</p>
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-4 pt-4 border-t flex justify-between items-center">
             <span className="font-semibold text-lg">Budget: ${gig.budget}</span>
+            {isSpecificOwner && <span className="text-xs text-blue-600 font-medium">You are the author</span>}
           </div>
         </CardContent>
       </Card>
 
-      {/* 2. Owner View: Manage Bids */}
-      {isOwner && (
+      {isSpecificOwner && (
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Received Bids ({bids.length})</h2>
           {bids.length === 0 ? (
@@ -162,29 +159,32 @@ export default function GigDetailPage() {
         </div>
       )}
 
-      {/* 3. Freelancer View: Bidding logic */}
-      {isFreelancer && (
+{!isSpecificOwner && (
         <div className="space-y-6">
           {hasAlreadyBid ? (
-            <Card className="bg-blue-50">
-              <CardContent className="p-4">
-                <h3 className="font-bold text-blue-800">Your Application Status</h3>
-                <div className="mt-2 flex items-center justify-between">
-                   <p>You bid <strong>${bids.find(b => b.freelancer._id === user?.id)?.amount}</strong></p>
-                   <Badge>{bids.find(b => b.freelancer._id === user?.id)?.status.toUpperCase()}</Badge>
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4 flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-blue-800">Application Submitted</h3>
+                  <p className="text-sm">You have already placed a bid on this project.</p>
                 </div>
+                <Badge variant="outline" className="bg-white">
+                  {bids.find(b => b.freelancer._id === user?.id)?.status.toUpperCase()}
+                </Badge>
               </CardContent>
             </Card>
-          ) : gig.status === "open" ? (
+          ) : canPlaceBid ? (
             <div className="border-t pt-6">
-              <h2 className="text-xl font-bold mb-4">Interested? Place your bid</h2>
+              <h2 className="text-xl font-bold mb-4">Place a Bid</h2>
               <BidForm
                 gigId={gig._id}
                 onBidCreated={(newBid) => setBids((prev) => [newBid, ...prev])}
               />
             </div>
           ) : (
-            <p className="text-center text-muted-foreground italic">This gig is no longer accepting bids.</p>
+            gig.status !== "open" && (
+              <p className="text-center text-muted-foreground italic">This gig is no longer accepting bids.</p>
+            )
           )}
         </div>
       )}

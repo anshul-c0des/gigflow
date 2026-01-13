@@ -205,11 +205,24 @@ export const hireFreelancer = async (req: AuthRequest, res: Response) => {
     }
   );
 
-  emitToUser(bid.freelancer.toString(), "gig:hired", {
+  emitToUser(bid.freelancer.toString(), "notification:new", {
+    type: "hired",
+    title: "Hired!",
+    message: `You have been hired for "${gig.title}"`,
     gigId: gig._id,
     bidId: bid._id,
     amount: bid.amount,
   });
+
+  const otherBids = await Bid.find({ gig: gigId, _id: { $ne: bidId } });
+    otherBids.forEach((otherBid) => {
+      emitToUser(otherBid.freelancer.toString(), "notification:new", {
+        type: "rejected",
+        title: "Application Status",
+        message: `The gig "${gig.title}" has been closed.`,
+        gigId: gig._id,
+      });
+    });
   
   res.status(200).json({
     message: "Freelancer hired successfully",

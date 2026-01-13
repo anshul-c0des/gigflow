@@ -10,6 +10,6 @@ export const useHireNotifications = () => {
       alert(`🎉 You were hired for gig ${data.gigId}!`);
     });
 
-    return () => socket.off("gig:hired");
+    return () => {socket.off("gig:hired");}
   }, []);
 };

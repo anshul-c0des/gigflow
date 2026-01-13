@@ -35,6 +35,13 @@ export const createBid = async (req: AuthRequest, res: Response) => {
       status: "pending",
     });
 
+    emitToUser(gig.owner.toString(), "notification:new", {
+      type: "new_bid",
+      title: "New Bid Received",
+      message: `A freelancer bid $${amount} on your gig "${gig.title}"`,
+      gigId: gig._id,
+    });
+
     emitToUser(gig.owner.toString(), "bid:created", bid);
 
     res.status(201).json({ message: "Bid submitted", bid });
