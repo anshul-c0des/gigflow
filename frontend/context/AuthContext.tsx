@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import { loginUser, registerUser } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { connectSocket} from "@/lib/socket";
+import toast from "react-hot-toast";
 
 interface AuthUser {
   id: string;
@@ -45,15 +46,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!user) return;
   
-    // Initialize socket only once
     const socket = connectSocket();
   
     socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket.id);
+      console.log("Socket connected:", socket.id);
     });
   
     socket.on("disconnect", () => {
-      console.log("⚠️ Socket disconnected");
+      console.log("Socket disconnected");
     });
   
     return () => {
@@ -65,12 +65,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     const res = await loginUser({ email, password });
     setUser(res.data.user);
+    toast.success("Logged in successfully");
     return res.data.user;
   };
-
+  
   const register = async (data: { name: string; email: string; password: string; role: "owner" | "freelancer" }) => {
     const res = await registerUser(data);
     setUser(res.data.user);
+    toast.success("Registered successfully");
   };
 
   const logout = async () => {
@@ -80,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Logout error", err);
     } finally {
       setUser(null);
+      toast.success("Logged out successfully")
       router.push('/')
     }
   };

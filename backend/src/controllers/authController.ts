@@ -65,12 +65,12 @@ export const login = async (req: Request, res: Response) => {
 
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(401).json({ message: "Invalid credentials. Please check your email!" });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(401).json({ message: "Invalid credentials. Please try again." });
   }
 
   const token = signToken({

@@ -94,32 +94,36 @@ export const deleteGig = async (req: AuthRequest, res: Response) => {
 };
 
 export const searchGigs = async (req: Request, res: Response) => {
-  const q = req.query.q as string;
+  const q = (req.query.q as string)?.trim();
 
   if (!q) {
-    return res.status(400).json({
-      message: "Search query is required",
-    });
+    return res.status(400).json({ message: "Search query required" });
   }
 
-  const gigs = await Gig.find(
+  let gigs = await Gig.find(
     {
-      $text: { $search: q },
       status: "open",
+      $text: { $search: q },
     },
-    {
-      score: { $meta: "textScore" },
-    }
+    { score: { $meta: "textScore" } }
   )
     .sort({ score: { $meta: "textScore" } })
-    .populate("owner", "name email")
+    .populate("owner", "name")
     .lean();
 
-  res.status(200).json({
-    results: gigs,
-    count: gigs.length,
-  });
+  if (gigs.length === 0 && q.length >= 3) {
+    gigs = await Gig.find({
+      status: "open",
+      $or: [
+        { title: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+      ],
+    }).populate("owner", "name").lean();
+  }
+
+  res.json({ results: gigs, count: gigs.length });
 };
+
 
 export const getGigDetails = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;

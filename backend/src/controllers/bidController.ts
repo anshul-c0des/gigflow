@@ -42,9 +42,11 @@ export const createBid = async (req: AuthRequest, res: Response) => {
       gigId: gig._id,
     });
 
-    emitToUser(gig.owner.toString(), "bid:created", bid);
+    const populatedBid = await bid.populate("freelancer", "name");
 
-    res.status(201).json({ message: "Bid submitted", bid });
+    emitToUser(gig.owner.toString(), "bid:created", populatedBid);
+
+    res.status(201).json({ message: "Bid submitted", bid: populatedBid });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err });
   }

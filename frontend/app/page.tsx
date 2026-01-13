@@ -1,50 +1,70 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <div className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-      {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <section className="relative h-[calc(100vh-68px)] flex items-center justify-center bg-white overflow-hidden">
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-emerald-100/40 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-teal-100/30 rounded-full blur-[120px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
+      </div>
 
-      <div className="container relative z-10 px-4 md:px-6 text-center">
-        <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm mb-6 bg-muted/50 text-muted-foreground animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <Zap className="w-3 h-3 mr-2 fill-primary text-primary" />
-          <span>Start Hiring or Get Hired</span>
+      <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
+        
+        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-50/80 backdrop-blur-md border border-slate-200/50 mb-8 shadow-sm">
+          <div className="flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
+            Next-Gen Freelance Protocol
+          </span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
-          Gig<span className="text-primary">Flow</span>
+        <h1 className="text-7xl md:text-[7rem] font-bold tracking-tighter text-slate-900 mb-6 leading-none">
+          Gig<span className="text-emerald-950">Flow.</span>
         </h1>
 
-        <p className="max-w-[700px] mx-auto text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
-          Where elite talent meets high-impact projects. 
-          Experience a <strong>race-condition-safe</strong> marketplace built for speed and reliability.
+        <p className="max-w-[540px] text-lg md:text-xl text-slate-500 mb-10 leading-relaxed font-medium">
+          The high-fidelity terminal where <span className="text-slate-900">elite talent</span> meets <span className="text-slate-900">high-impact</span> projects. Scalable, secure, and atomic.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button size="lg" className="h-12 px-8 text-md font-semibold">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 w-full">         
+          <Button 
+            asChild
+            variant="outline" 
+            className="h-14 px-10 text-lg text-slate-700 bg-white/40 backdrop-blur-md border-slate-200 font-bold hover:bg-emerald-100/60 rounded-2xl shadow-sm transition-all active:scale-95"
+          >
+            <Link href="/gigs">Login</Link>
+          </Button>
+
+          <Button 
+            asChild
+            className="h-14 px-10 text-lg bg-emerald-500 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-950/20 active:scale-95 group"
+          >
             <Link href="/register">
               Get Started
-            </Link>
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-          
-          <Button size="lg" variant="outline" className="h-12 px-8 text-md font-semibold">
-            <Link href="/login">
-              Login to Account
+              <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
         </div>
 
-        {/* Feature Tags */}
-        <div className="mt-16 flex flex-wrap justify-center gap-8 text-sm font-medium text-muted-foreground/80">
-          <div className="flex items-center gap-2">✓ Real-time Notifications</div>
-          <div className="flex items-center gap-2">✓ Atomic Hiring Logic</div>
-          <div className="flex items-center gap-2">✓ TypeScript Powered</div>
+        <div className="w-full max-w-3xl flex flex-wrap justify-center items-center gap-x-10 gap-y-4 pt-2 border-t border-slate-100">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={16} className="text-emerald-600" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">hire or get hired</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Zap size={16} className="text-teal-500" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Atomic Logic</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-blue-500" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Real-time Notifications</span>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
