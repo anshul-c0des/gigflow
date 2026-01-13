@@ -5,7 +5,7 @@ import { createBidSchema } from "../validators/bidValidator";
 import { AuthUser } from "../types/auth";
 import { emitToUser } from "../sockets";
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
     user?: AuthUser;
 }
 
