@@ -13,7 +13,7 @@ export interface LoginPayload {
 }
 
 export const registerUser = (data: RegisterPayload) =>
-  api.post("/auth/register", data);
+  api.post("/auth/register", data); 
 
 export const loginUser = (data: LoginPayload) =>
   api.post("/auth/login", data);
