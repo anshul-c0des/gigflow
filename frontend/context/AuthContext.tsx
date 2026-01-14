@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<AuthUser> => {
     const res = await loginUser({ email, password });
     setUser(res.data.user);
+    router.push("/dashboard");
     toast.success("Logged in successfully");
     return res.data.user;
   };
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (data: { name: string; email: string; password: string; role: "owner" | "freelancer" }) => {
     const res = await registerUser(data);
     setUser(res.data.user);
+    router.push("/dashboard");
     toast.success("Registered successfully");
   };
 

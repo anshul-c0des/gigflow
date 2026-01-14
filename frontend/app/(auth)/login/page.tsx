@@ -24,8 +24,7 @@ export default function LoginPage() {
 
     try {
       const loggedInUser = await login(form.email, form.password);
-      const redirectPath = loggedInUser?.role === 'owner' ? '/dashboard?tab=owner' : '/dashboard?tab=freelancer';
-      router.push(redirectPath);
+      console.log("Logged in user:", loggedInUser);
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid credentials. Please try again.");
       setIsSubmitting(false);

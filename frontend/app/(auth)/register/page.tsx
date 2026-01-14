@@ -29,7 +29,6 @@ export default function RegisterPage() {
 
     try {
       await register(form);
-      router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
       setIsSubmitting(false);
