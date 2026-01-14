@@ -1,13 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, CheckCircle2, XCircle, MessageSquare, Sparkles, Inbox } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Bell,
+  XCircle,
+  MessageSquare,
+  Sparkles,
+  Inbox,
+} from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { getSocket } from "@/lib/socket";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 
-export type Notification = {
+export type Notification = {   // type for session notifications
   id: string;
   type: "hired" | "rejected" | "new_bid";
   title: string;
@@ -17,10 +27,10 @@ export type Notification = {
 };
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const [notifications, setNotifications] = useState<Notification[]>([]);   // state for temp notifications
+  const unreadCount = notifications.filter((n) => !n.read).length;   // track unread notifications
 
-  useEffect(() => {
+  useEffect(() => {   // socket init
     const socket = getSocket();
     if (!socket) return;
 
@@ -46,22 +56,25 @@ export default function Notifications() {
   return (
     <Popover onOpenChange={(open) => open && markAllAsRead()}>
       <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="relative rounded-xl bg-slate-50 border border-slate-100 transition-all hover:bg-white hover:shadow-sm"
         >
           <Bell className="w-5 h-5 text-slate-600" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
-               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-               <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 border-2 border-white"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 border-2 border-white"></span>
             </span>
           )}
         </Button>
       </PopoverTrigger>
-      
-      <PopoverContent className="w-96 p-0 mt-2 rounded-[2rem] border-slate-200 shadow-2xl overflow-hidden bg-white/95 backdrop-blur-xl" align="end">
+
+      <PopoverContent
+        className="w-96 p-0 mt-2 rounded-[2rem] border-slate-200 shadow-2xl overflow-hidden bg-white/95 backdrop-blur-xl"
+        align="end"
+      >
         <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-sm text-slate-900">Notifications</h3>
@@ -71,7 +84,10 @@ export default function Notifications() {
               </span>
             )}
           </div>
-          <button disabled={notifications.length===0} className="cursor-pointer text-[11px] font-bold text-slate-400 hover:text-emerald-700 transition-colors">
+          <button
+            disabled={notifications.length === 0}
+            className="cursor-pointer text-[11px] font-bold text-slate-400 hover:text-emerald-700 transition-colors"
+          >
             Mark all as read
           </button>
         </div>
@@ -96,23 +112,35 @@ export default function Notifications() {
                   }`}
                 >
                   <div className="flex-shrink-0">
-                    <div className={`p-2.5 rounded-2xl shadow-sm border transition-transform group-hover:scale-110 ${
-                      n.type === "hired" ? "bg-emerald-50 border-emerald-100 text-emerald-600" :
-                      n.type === "rejected" ? "bg-rose-50 border-rose-100 text-rose-500" :
-                      "bg-teal-50 border-teal-100 text-teal-600"
-                    }`}>
+                    <div
+                      className={`p-2.5 rounded-2xl shadow-sm border transition-transform group-hover:scale-110 ${
+                        n.type === "hired"
+                          ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                          : n.type === "rejected"
+                          ? "bg-rose-50 border-rose-100 text-rose-500"
+                          : "bg-teal-50 border-teal-100 text-teal-600"
+                      }`}
+                    >
                       {n.type === "hired" && <Sparkles className="w-4 h-4" />}
                       {n.type === "rejected" && <XCircle className="w-4 h-4" />}
-                      {n.type === "new_bid" && <MessageSquare className="w-4 h-4" />}
+                      {n.type === "new_bid" && (
+                        <MessageSquare className="w-4 h-4" />
+                      )}
                     </div>
                   </div>
-                  
+
                   <div className="flex-1 space-y-1">
                     <div className="flex justify-between items-start">
-                      <p className="text-sm font-bold text-slate-900">{n.title}</p>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Just now</span>
+                      <p className="text-sm font-bold text-slate-900">
+                        {n.title}
+                      </p>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                        Just now
+                      </span>
                     </div>
-                    <p className="text-xs text-slate-500 leading-relaxed pr-4 font-medium">{n.message}</p>
+                    <p className="text-xs text-slate-500 leading-relaxed pr-4 font-medium">
+                      {n.message}
+                    </p>
                     {!n.read && (
                       <div className="absolute top-1/2 right-4 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     )}

@@ -7,15 +7,17 @@ import { emitToUser } from "../sockets";
 import mongoose, { InferSchemaType, Types } from "mongoose";
 
 interface AuthRequest extends Request {
-    user?: AuthUser;
+  user?: AuthUser;
 }
 type BidType = InferSchemaType<typeof Bid.schema> & { _id: Types.ObjectId };
 
-export const createGig = async (req: AuthRequest, res: Response) => {
+export const createGig = async (req: AuthRequest, res: Response) => {   // creates a new gig
   try {
     const parsed = createGigSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten() });
+      return res
+        .status(400)
+        .json({ message: "Invalid input", errors: parsed.error.flatten() });
     }
 
     const gig = await Gig.create({
@@ -30,43 +32,35 @@ export const createGig = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getGigs = async (_req: Request, res: Response) => {
+export const getGigs = async (_req: Request, res: Response) => {   // get gigs
   try {
     const gigs = await Gig.find({ status: "open" })
-    .populate("owner", "name email")
-    .sort({ createdAt: -1 })
-    .lean();
+      .populate("owner", "name email")
+      .sort({ createdAt: -1 })
+      .lean();
 
-  res.status(200).json({
-    count: gigs.length,
-    gigs,
-  });
+    res.status(200).json({
+      count: gigs.length,
+      gigs,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err });
   }
 };
 
-export const getGigById = async (req: Request, res: Response) => {
-  try {
-    const gig = await Gig.findById(req.params.id);
-    if (!gig) return res.status(404).json({ message: "Gig not found" });
-    res.status(200).json({ gig });
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err });
-  }
-};
-
-export const updateGig = async (req: AuthRequest, res: Response) => {
+export const updateGig = async (req: AuthRequest, res: Response) => {   // update a gig
   try {
     const parsed = updateGigSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten() });
+      return res
+        .status(400)
+        .json({ message: "Invalid input", errors: parsed.error.flatten() });
     }
 
     const gig = await Gig.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
-    if (!gig.owner.equals(req.user?.id)) {
-        return res.status(403).json({ message: "Unauthorized" });
+    if (!gig.owner.equals(req.user?.id)) {   // owner only
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
     Object.assign(gig, parsed.data);
@@ -78,12 +72,12 @@ export const updateGig = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const deleteGig = async (req: AuthRequest, res: Response) => {
+export const deleteGig = async (req: AuthRequest, res: Response) => {   // delete a gig
   try {
     const gig = await Gig.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
     if (!gig.owner.equals(req.user?.id)) {
-        return res.status(403).json({ message: "Unauthorized" });
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
     await gig.deleteOne();
@@ -93,7 +87,7 @@ export const deleteGig = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const searchGigs = async (req: Request, res: Response) => {
+export const searchGigs = async (req: Request, res: Response) => {   // search a gig
   const q = (req.query.q as string)?.trim();
 
   if (!q) {
@@ -111,38 +105,41 @@ export const searchGigs = async (req: Request, res: Response) => {
     .populate("owner", "name")
     .lean();
 
-  if (gigs.length === 0 && q.length >= 3) {
+  if (gigs.length === 0 && q.length >= 3) {   // partial word matching
     gigs = await Gig.find({
       status: "open",
       $or: [
         { title: { $regex: q, $options: "i" } },
         { description: { $regex: q, $options: "i" } },
       ],
-    }).populate("owner", "name").lean();
+    })
+      .populate("owner", "name")
+      .lean();
   }
 
   res.json({ results: gigs, count: gigs.length });
 };
 
-
-export const getGigDetails = async (req: AuthRequest, res: Response) => {
+export const getGigDetails = async (req: AuthRequest, res: Response) => {   // fetch gig details
   const userId = req.user?.id;
 
   try {
-    const gig = await Gig.findById(req.params.id).populate("owner", "name email").lean();
+    const gig = await Gig.findById(req.params.id)
+      .populate("owner", "name email")
+      .lean();
     if (!gig) return res.status(404).json({ message: "Gig not found" });
 
     let bids: BidType[] = [];
 
     if (userId) {
       const isOwner = gig.owner._id.equals(userId);
-    
+
       const filter: any = { gig };
-    
+
       if (!isOwner) {
         filter.freelancer = userId;
       }
-    
+
       bids = await Bid.find(filter)
         .populate("freelancer", "name email")
         .sort({ createdAt: -1 })
@@ -155,12 +152,12 @@ export const getGigDetails = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const hireFreelancer = async (req: AuthRequest, res: Response) => {
+export const hireFreelancer = async (req: AuthRequest, res: Response) => {   // hire a freelancer
   try {
     const userId = req.user?.id;
     const { gigId } = req.params;
     const { bidId } = req.body;
-    
+
     if (typeof gigId !== "string") {
       return res.status(400).json({ message: "Invalid Gig ID format" });
     }
@@ -174,51 +171,51 @@ export const hireFreelancer = async (req: AuthRequest, res: Response) => {
         message: "You are not authorized to hire for this gig",
       });
     }
-  
+
     if (gig.status !== "open") {
       return res.status(400).json({
         message: "This gig is no longer open for hiring",
       });
     }
-  
-  const bid = await Bid.findById(bidId);
-  if (!bid) {
-    return res.status(404).json({ message: "Bid not found" });
-  }
-  
-  if (!bid.gig.equals(gigId)) {
-    return res.status(400).json({
-      message: "This bid does not belong to this gig",
-    });
-  }
-  
-  gig.status = "assigned";
-  gig.hiredFreelancer = bid.freelancer;
-  await gig.save();
-  
-  bid.status = "hired";
-  await bid.save();
-  
-  await Bid.updateMany(
-    {
-      gig: gigId,
-      _id: { $ne: bidId },
-    },
-    {
-      $set: { status: "rejected" },
+
+    const bid = await Bid.findById(bidId);
+    if (!bid) {
+      return res.status(404).json({ message: "Bid not found" });
     }
-  );
 
-  emitToUser(bid.freelancer.toString(), "notification:new", {
-    type: "hired",
-    title: "Hired!",
-    message: `You have been hired for "${gig.title}"`,
-    gigId: gig._id,
-    bidId: bid._id,
-    amount: bid.amount,
-  });
+    if (!bid.gig.equals(gigId)) {
+      return res.status(400).json({
+        message: "This bid does not belong to this gig",
+      });
+    }
 
-  const otherBids = await Bid.find({ gig: gigId, _id: { $ne: bidId } });
+    gig.status = "assigned";   // set status to assigned
+    gig.hiredFreelancer = bid.freelancer;   // assign to freelancer
+    await gig.save();
+
+    bid.status = "hired";   // updates bid
+    await bid.save();
+
+    await Bid.updateMany(   // mark other bids as rejected
+      {
+        gig: gigId,
+        _id: { $ne: bidId },
+      },
+      {
+        $set: { status: "rejected" },
+      }
+    );
+
+    emitToUser(bid.freelancer.toString(), "notification:new", {   // emit hired notification
+      type: "hired",
+      title: "Hired!",
+      message: `You have been hired for "${gig.title}"`,
+      gigId: gig._id,
+      bidId: bid._id,
+      amount: bid.amount,
+    });
+
+    const otherBids = await Bid.find({ gig: gigId, _id: { $ne: bidId } });   // emit rejected notification
     otherBids.forEach((otherBid) => {
       emitToUser(otherBid.freelancer.toString(), "notification:new", {
         type: "rejected",
@@ -227,24 +224,24 @@ export const hireFreelancer = async (req: AuthRequest, res: Response) => {
         gigId: gig._id,
       });
     });
-  
-  res.status(200).json({
-    message: "Freelancer hired successfully",
-    hiredFreelancer: bid.freelancer,
-  });
-} catch (error) {
-  res.status(500).json({ message: "Server error during hiring process" });
-}
+
+    res.status(200).json({
+      message: "Freelancer hired successfully",
+      hiredFreelancer: bid.freelancer,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error during hiring process" });
+  }
 };
 
-export const getMyGigs = async (req: AuthRequest, res: Response) => {
+export const getMyGigs = async (req: AuthRequest, res: Response) => {   // get my gigs
   try {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const gigs = await Gig.aggregate([
       {
-        $match: { owner: new mongoose.Types.ObjectId(userId) }
+        $match: { owner: new mongoose.Types.ObjectId(userId) },
       },
       {
         $lookup: {
@@ -264,8 +261,8 @@ export const getMyGigs = async (req: AuthRequest, res: Response) => {
         },
       },
       {
-        $sort: { createdAt: -1 }
-      }
+        $sort: { createdAt: -1 },
+      },
     ]);
 
     res.status(200).json(gigs);

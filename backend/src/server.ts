@@ -14,16 +14,17 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-mongoose.connect(MONGO_URI)
+mongoose
+  .connect(MONGO_URI)
   .then(() => console.log("MongoDB connected"))
-  .catch(err => {
+  .catch((err) => {
     console.error("MongoDB connection error:", err);
     process.exit(1);
   });
 
-  const server = http.createServer(app);
+const server = http.createServer(app);
 
-  initSocket(server);
+initSocket(server);
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

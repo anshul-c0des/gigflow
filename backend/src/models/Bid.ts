@@ -13,10 +13,18 @@ export interface IBid extends mongoose.Document {
 const bidSchema = new mongoose.Schema<IBid>(
   {
     gig: { type: mongoose.Schema.Types.ObjectId, ref: "Gig", required: true },
-    freelancer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    freelancer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     amount: { type: Number, required: true },
-    message: { type: String, required:false },
-    status: { type: String, enum: ["pending", "hired", "rejected"], default: "pending" },
+    message: { type: String, required: false },
+    status: {
+      type: String,
+      enum: ["pending", "hired", "rejected"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );

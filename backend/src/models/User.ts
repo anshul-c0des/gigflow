@@ -13,7 +13,11 @@ const userSchema = new mongoose.Schema<IUser>(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true, select: false },
-    role: { type: String, enum: ["owner", "freelancer"], default: "freelancer" },
+    role: {
+      type: String,
+      enum: ["owner", "freelancer"],
+      default: "freelancer",
+    },
   },
   { timestamps: true }
 );

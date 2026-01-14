@@ -6,26 +6,33 @@ import { AuthUser } from "../types/auth";
 import { emitToUser } from "../sockets";
 
 export interface AuthRequest extends Request {
-    user?: AuthUser;
+  user?: AuthUser;
 }
 
-// Create a bid
-export const createBid = async (req: AuthRequest, res: Response) => {
+export const createBid = async (req: AuthRequest, res: Response) => {   // create a bid
   try {
     const parsed = createBidSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ message: "Invalid input", errors: parsed.error.flatten() });
+      return res
+        .status(400)
+        .json({ message: "Invalid input", errors: parsed.error.flatten() });
     }
 
     const { gigId, amount, message } = parsed.data;
 
     const gig = await Gig.findById(gigId);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
-    if (gig.owner.equals(req.user?.id)) return res.status(403).json({ message: "Cannot bid on your own gig" });
-    if (gig.status !== "open") return res.status(400).json({ message: "Gig is not open for bidding" });
+    if (gig.owner.equals(req.user?.id))
+      return res.status(403).json({ message: "Cannot bid on your own gig" });
+    if (gig.status !== "open")
+      return res.status(400).json({ message: "Gig is not open for bidding" });
 
-    const existingBid = await Bid.findOne({ gig: gigId, freelancer: req.user?.id });
-    if (existingBid) return res.status(409).json({ message: "You already bid on this gig" });
+    const existingBid = await Bid.findOne({
+      gig: gigId,
+      freelancer: req.user?.id,
+    });
+    if (existingBid)
+      return res.status(409).json({ message: "You already bid on this gig" });
 
     const bid = await Bid.create({
       gig: gigId,
@@ -57,9 +64,13 @@ export const getBidsForGig = async (req: AuthRequest, res: Response) => {
   try {
     const gig = await Gig.findById(req.params.gigId);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
-    if (!gig.owner.equals(req.user?.id)) return res.status(403).json({ message: "Unauthorized" });
+    if (!gig.owner.equals(req.user?.id))
+      return res.status(403).json({ message: "Unauthorized" });
 
-    const bids = await Bid.find({ gig: req.params.gigId }).populate("freelancer", "name email role");
+    const bids = await Bid.find({ gig: req.params.gigId }).populate(
+      "freelancer",
+      "name email role"
+    );
 
     res.status(200).json({ bids });
   } catch (err) {
@@ -73,16 +84,16 @@ export const getMyBids = async (req: AuthRequest, res: Response) => {
 
     const bids = await Bid.find({ freelancer: userId })
       .populate({
-        path: 'gig',
-        select: 'title status',
+        path: "gig",
+        select: "title status",
       })
       .sort({ createdAt: -1 });
 
     res.status(200).json(bids);
   } catch (error: any) {
-    res.status(500).json({ 
-      message: 'Failed to fetch your bids', 
-      error: error.message 
+    res.status(500).json({
+      message: "Failed to fetch your bids",
+      error: error.message,
     });
   }
 };

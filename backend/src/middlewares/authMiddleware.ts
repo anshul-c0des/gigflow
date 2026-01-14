@@ -22,8 +22,8 @@ export const protect = (
     const payload = verifyToken<{ id: string; role: AuthUser["role"] }>(token);
 
     if (!payload) {
-        return res.status(401).json({ message: "Invalid or expired token" });
-      }
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     req.user = {
       id: new Types.ObjectId(payload.id),
@@ -37,23 +37,23 @@ export const protect = (
 };
 
 export const ownerOnly = (
-    req: Request & { user?: AuthUser },
-    res: Response,
-    next: NextFunction
-  ) => {
-    if (req.user?.role !== "owner") {
-      return res.status(403).json({ message: "Owners only" });
-    }
-    next();
-  };
-  
-  export const freelancerOnly = (
-    req: Request & { user?: AuthUser },
-    res: Response,
-    next: NextFunction
-  ) => {
-    if (req.user?.role !== "freelancer") {
-      return res.status(403).json({ message: "Freelancers only" });
-    }
-    next();
-  };
+  req: Request & { user?: AuthUser },
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user?.role !== "owner") {
+    return res.status(403).json({ message: "Owners only" });
+  }
+  next();
+};
+
+export const freelancerOnly = (
+  req: Request & { user?: AuthUser },
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user?.role !== "freelancer") {
+    return res.status(403).json({ message: "Freelancers only" });
+  }
+  next();
+};

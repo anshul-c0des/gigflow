@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
-  const router = useRouter();
   const { login, loading: authLoading, user } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -26,7 +30,9 @@ export default function LoginPage() {
       const loggedInUser = await login(form.email, form.password);
       console.log("Logged in user:", loggedInUser);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      setError(
+        err.response?.data?.message || "Invalid credentials. Please try again."
+      );
       setIsSubmitting(false);
     }
   };
@@ -50,7 +56,10 @@ export default function LoginPage() {
         <CardContent className="pb-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+              <Label
+                htmlFor="email"
+                className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1"
+              >
                 Email Address
               </Label>
               <Input
@@ -66,10 +75,16 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
-                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                <Label
+                  htmlFor="password"
+                  className="text-xs font-bold uppercase tracking-widest text-slate-500"
+                >
                   Password
                 </Label>
-                <Link href="#" className="text-xs font-bold text-emerald-700 hover:text-emerald-900">
+                <Link
+                  href="#"
+                  className="text-xs font-bold text-emerald-700 hover:text-emerald-900"
+                >
                   Forgot?
                 </Link>
               </div>
@@ -90,8 +105,8 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting}
               className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-950/10 transition-all active:scale-[0.98]"
             >
@@ -108,7 +123,10 @@ export default function LoginPage() {
           <div className="mt-8 text-center">
             <p className="text-sm text-slate-500 font-medium">
               New to GigFlow?{" "}
-              <Link href="/register" className="text-emerald-700 font-bold hover:underline underline-offset-4">
+              <Link
+                href="/register"
+                className="text-emerald-700 font-bold hover:underline underline-offset-4"
+              >
                 Create an account
               </Link>
             </p>

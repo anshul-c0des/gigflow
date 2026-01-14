@@ -5,41 +5,46 @@ import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 
-const jakarta = Plus_Jakarta_Sans({ 
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: '--font-jakarta',
+  variable: "--font-jakarta",
 });
 
 export const metadata: Metadata = {
   title: "GigFlow",
   description: "Connect with elite talent and secure high-value gigs.",
   icons: {
-    icon: '/gigflow.png'
-  }
+    icon: "/gigflow.png",
+  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="antialiased">
-      <body className={`${jakarta.variable} font-sans bg-slate-50 text-slate-900`}>
+      <body
+        className={`${jakarta.variable} font-sans bg-slate-50 text-slate-900`}
+      >
         <AuthProvider>
           <div className="relative flex min-h-screen flex-col">
             <Navbar />
-            
-            <main className="flex-1">
-              {children}
-            </main>
-            
-            <Toaster 
+
+            <main className="flex-1">{children}</main>
+
+            <Toaster
               position="top-right"
               toastOptions={{
-                className: 'rounded-xl border border-slate-100 font-medium py-4 px-6 shadow-lg',
+                className:
+                  "rounded-xl border border-slate-100 font-medium py-4 px-6 shadow-lg",
                 success: {
-                  iconTheme: { primary: '#10B981', secondary: '#fff' },
+                  iconTheme: { primary: "#10B981", secondary: "#fff" },
                 },
                 error: {
-                  iconTheme: { primary: '#F43F5E', secondary: '#fff' },
-                }
+                  iconTheme: { primary: "#F43F5E", secondary: "#fff" },
+                },
               }}
             />
           </div>

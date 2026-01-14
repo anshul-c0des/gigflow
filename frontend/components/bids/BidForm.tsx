@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Loader2, SendHorizontal, Info, IndianRupee, Zap } from "lucide-react";
+import { SendHorizontal, IndianRupee, Zap } from "lucide-react";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -16,22 +16,22 @@ type Props = {
 };
 
 export const BidForm = ({ gigId, onBidCreated }: Props) => {
-  const [amount, setAmount] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState("");   // bid amount
+  const [message, setMessage] = useState("");   // bid message
+  const [loading, setLoading] = useState(false);   // loading state
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {   // submit proposal/bid
     e.preventDefault();
     if (Number(amount) <= 0) return toast.error("Please enter a valid amount");
 
     setLoading(true);
     try {
-      const { data } = await api.post("/bids", { 
-        gigId, 
-        amount: Number(amount), 
-        message: message || "" 
+      const { data } = await api.post("/bids", {
+        gigId,
+        amount: Number(amount),
+        message: message || "",
       });
-      
+
       toast.success("Proposal submitted successfully!");
       onBidCreated(data.bid);
       setAmount("");
@@ -52,7 +52,9 @@ export const BidForm = ({ gigId, onBidCreated }: Props) => {
           </div>
           <div>
             <CardTitle className="text-lg font-bold">Submit Proposal</CardTitle>
-            <p className="text-xs text-slate-500 font-medium">Set your terms for this gig</p>
+            <p className="text-xs text-slate-500 font-medium">
+              Set your terms for this gig
+            </p>
           </div>
         </div>
       </CardHeader>
@@ -60,7 +62,10 @@ export const BidForm = ({ gigId, onBidCreated }: Props) => {
       <CardContent className="-mt-1">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-sm font-semibold text-slate-700">
+            <Label
+              htmlFor="amount"
+              className="text-sm font-semibold text-slate-700"
+            >
               Your Bid
             </Label>
             <div className="relative">
@@ -80,7 +85,10 @@ export const BidForm = ({ gigId, onBidCreated }: Props) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message" className="text-sm font-semibold text-slate-700">
+            <Label
+              htmlFor="message"
+              className="text-sm font-semibold text-slate-700"
+            >
               Message for Bid owner
             </Label>
             <Textarea
@@ -98,14 +106,14 @@ export const BidForm = ({ gigId, onBidCreated }: Props) => {
             disabled={loading}
             className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-lg shadow-teal-600/20 transition-all active:scale-[0.98] group"
           >
-
             {loading ? (
-                <div className="flex h-screen items-center justify-center bg-slate-50">
+              <div className="flex h-screen items-center justify-center bg-slate-50">
                 <Zap className="h-8 w-8 animate-pulse text-brand" />
               </div>
             ) : (
               <span className="flex items-center gap-2">
-                Send Proposal <SendHorizontal className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Send Proposal{" "}
+                <SendHorizontal className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             )}
           </Button>

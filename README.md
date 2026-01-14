@@ -1,20 +1,20 @@
-# GigFlow - Full Stack Freelance Marketplace
+# 🚀 GigFlow - Full Stack Freelance Marketplace
 GigFlow is a mini-freelance marketplace platform that allows clients to post jobs (Gigs) and freelancers to bid on them. It provides a simple yet powerful system for managing gigs, bids, and hiring, allowing users to seamlessly interact within the platform.
 
-## Key Features:
+## 🌟 Key Features:
 - User authentication (sign-up, login, and session management using JWT tokens).
 - Role-based access for Owners/Clients and Freelancers.
 - Gig management with CRUD operations.
 - Freelancers can place bids on gigs and clients can hire them.
 - Real-time notifications for hired freelancers.
 
-## Tech Stack
+## ⚙️ Tech Stack
 - Frontend: Next.js, Tailwind CSS, Shadcn UI, React Context API, Axios, TypeScript.
 - Backend: Node.js, Express.js, JWT (JSON Web Tokens) for authentication, Mongoose (MongoDB ODM), Zod.
 - Database: MongoDB (via Mongoose).
 - Real-time Updates: Socket.io for real-time hire notifications.
 
-## Core Features
+## 🏗️ Core Features
 ### User Authentication
 - Sign-up and Login: Secure user authentication using JWTs and HttpOnly cookies.
 - Role Management: Users can act as either Clients (posting jobs) or Freelancers (bidding on jobs).
@@ -31,7 +31,7 @@ GigFlow is a mini-freelance marketplace platform that allows clients to post job
 - Atomic Update Logic: The Gig status changes from "open" to "assigned".
 - Bid Status: The chosen Bid's status becomes "hired", and all other bids for the same gig are automatically marked as "rejected".
 
-## API Endpoints
+## 📝 API Endpoints
 | Category  | Method | Endpoint                       | Description                                      |
 |-----------|--------|--------------------------------|--------------------------------------------------|
 | **Auth**  | POST   | /api/auth/register             | Register a new user                             |
@@ -48,7 +48,7 @@ GigFlow is a mini-freelance marketplace platform that allows clients to post job
 
 
 
-## Database Schema
+## 🗃️ Database Schema
 ### User Schema
 ```ts
 interface User {
@@ -85,7 +85,7 @@ interface Bid {
 ### Real-time Notifications
 - Using Socket.io, a real-time notification system has been implemented. When a Client hires a Freelancer, the Freelancer is instantly notified without needing to refresh the page. The notifications are stored per session.
 
-## Setup Instructions
+## 🛠️ Setup Instructions
 ### Frontend
 1. Clone the repository:
 ```bash
@@ -145,7 +145,7 @@ CLIENT_URL=http://localhost:3000
 NODE_ENV=development
 ```
 
-## Live Deployment:
+## 🌍 Live Deployment:
 
 Check out the live demo:
 

@@ -6,7 +6,7 @@ import { authCookieOptions } from "../utils/cookies";
 import { registerSchema, loginSchema } from "../validators/authValidator";
 import { AuthUser } from "../types/auth";
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {   // registers a new user
   const parsed = registerSchema.safeParse(req.body);
 
   if (!parsed.success) {
@@ -23,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
     return res.status(409).json({ message: "Email already registered" });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);   // hash password before storing
 
   const user = await User.create({
     name,
@@ -51,7 +51,7 @@ export const register = async (req: Request, res: Response) => {
     });
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {   // login existing user
   const parsed = loginSchema.safeParse(req.body);
 
   if (!parsed.success) {
@@ -65,12 +65,16 @@ export const login = async (req: Request, res: Response) => {
 
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    return res.status(401).json({ message: "Invalid credentials. Please check your email!" });
+    return res
+      .status(401)
+      .json({ message: "Invalid credentials. Please check your email!" });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.status(401).json({ message: "Invalid credentials. Please try again." });
+    return res
+      .status(401)
+      .json({ message: "Invalid credentials. Please try again." });
   }
 
   const token = signToken({
@@ -92,7 +96,10 @@ export const login = async (req: Request, res: Response) => {
     });
 };
 
-export const getMe = async (req: Request & { user?: AuthUser }, res: Response) => {
+export const getMe = async (   // fetches current user
+  req: Request & { user?: AuthUser },
+  res: Response
+) => {
   try {
     const user = await User.findById(req.user?.id);
 
@@ -113,7 +120,7 @@ export const getMe = async (req: Request & { user?: AuthUser }, res: Response) =
   }
 };
 
-export const logout = async (_req: Request, res: Response) => {
+export const logout = async (_req: Request, res: Response) => {   // logout current user
   res
     .status(200)
     .cookie("token", "", {
