@@ -1,5 +1,5 @@
 # GigFlow - Full Stack Freelance Marketplace
-GigFlow is a mini-freelance marketplace platform that allows clients to post jobs (Gigs) and freelancers to bid on them. It provides a simple yet powerful system for managing gigs, bids, and hiring, allowing users to seamlessly interact within the platform. The project tests skills in handling complex database relationships, secure authentication, real-time notifications, and state management.
+GigFlow is a mini-freelance marketplace platform that allows clients to post jobs (Gigs) and freelancers to bid on them. It provides a simple yet powerful system for managing gigs, bids, and hiring, allowing users to seamlessly interact within the platform.
 
 ## Key Features:
 - User authentication (sign-up, login, and session management using JWT tokens).
@@ -15,7 +15,7 @@ GigFlow is a mini-freelance marketplace platform that allows clients to post job
 - Real-time Updates: Socket.io for real-time hire notifications.
 
 ## Core Features
-#### User Authentication
+### User Authentication
 - Sign-up and Login: Secure user authentication using JWTs and HttpOnly cookies.
 - Role Management: Users can act as either Clients (posting jobs) or Freelancers (bidding on jobs).
 
@@ -31,7 +31,7 @@ GigFlow is a mini-freelance marketplace platform that allows clients to post job
 - Atomic Update Logic: The Gig status changes from "open" to "assigned".
 - Bid Status: The chosen Bid's status becomes "hired", and all other bids for the same gig are automatically marked as "rejected".
 
-API Endpoints
+## API Endpoints
 | Category  | Method | Endpoint                       | Description                                      |
 |-----------|--------|--------------------------------|--------------------------------------------------|
 | **Auth**  | POST   | /api/auth/register             | Register a new user                             |
@@ -87,18 +87,18 @@ interface Bid {
 
 ## Setup Instructions
 ### Frontend
-Clone the repository:
+1. Clone the repository:
 ```bash
 git clone <repository_link>
 cd gigflow-frontend
 ```
 
-Install dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-Run the frontend:
+3. Run the frontend:
 ```bash
 npm run dev
 ```
@@ -107,20 +107,20 @@ The frontend will be available at http://localhost:3000.
 
 ### Backend
 
-Clone the repository:
+1. Clone the repository:
 ```bash
 git clone <repository_link>
 cd gigflow-backend
 ```
 
-Install dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-Create a .env file (refer to .env) and set the necessary environment variables.
+3. Create a .env file (refer to .env) and set the necessary environment variables.
 
-Run the backend:
+4. Run the backend:
 ```bash
 npm run dev
 ```
@@ -131,21 +131,23 @@ The backend API will be available at http://localhost:5000.
 
 Create the following .env files for both the frontend and backend.
 
-Frontend .env:
+- Frontend .env:
+```bash
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
-
-Backend .env:
-
+```
+- Backend .env:
+```bash
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/gigflow
 JWT_SECRET=your_jwt_secret
 PORT=5000
 CLIENT_URL=http://localhost:3000
 NODE_ENV=development
+```
 
 ## Live Deployment:
 
 Check out the live demo:
 
-Backend - Cold Start (Render): https://gigflow-fi8v.onrender.com
-Frontend (Vercel): https://gigflow-sepia.vercel.app
+- Backend - Cold Start: [Render](https://gigflow-fi8v.onrender.com)
+- Frontend: [Vercel](https://gigflow-sepia.vercel.app)
