@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 type Gig = {
   _id: string;
@@ -30,6 +31,8 @@ type Gig = {
 };
 
 export default function HomePage() {
+  useAuthCheck();
+
   const [gigs, setGigs] = useState<Gig[]>([]);
 const [query, setQuery] = useState("");
 const [loading, setLoading] = useState(false);

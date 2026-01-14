@@ -20,6 +20,7 @@ import api from "@/lib/axios";
 import { EditGigModal } from "@/components/gigs/EditGigModal";
 import toast from "react-hot-toast";
 import { formatDistanceToNow } from "date-fns";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 type Bid = {
   _id: string;
@@ -40,6 +41,8 @@ type Gig = {
 };
 
 export default function GigDetailPage() {
+  useAuthCheck();
+
   const { gigId } = useParams();
   const { user } = useAuth();
   const [gig, setGig] = useState<Gig | null>(null);

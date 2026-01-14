@@ -22,8 +22,10 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import api from "@/lib/axios";
 import { useRouter } from "next/navigation";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 export default function ProfilePage() {
+  useAuthCheck();
   const { user, logout, loading } = useAuth();
   const [stats, setStats] = useState({ 
     totalEarned: 0, 

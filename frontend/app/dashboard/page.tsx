@@ -5,8 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OwnerDashboard from "@/components/dashboard/OwnerDashboard";
 import FreelancerDashboard from "@/components/dashboard/FreelancerDashboard";
 import { Briefcase, UserSearch, Loader2, Zap } from "lucide-react";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 export default function DashboardPage() {
+  useAuthCheck();
   const { user, loading } = useAuth();
 
   if (loading) return (

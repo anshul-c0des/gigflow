@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Loader2, Briefcase, IndianRupee, Rocket, ArrowLeft, Zap } from "lucide-react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 const gigFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100),
@@ -23,6 +24,7 @@ const gigFormSchema = z.object({
 type GigFormValues = z.infer<typeof gigFormSchema>;
 
 export default function CreateGigPage() {
+  useAuthCheck();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
